@@ -29,7 +29,7 @@ class BookRepository implements BookRepositoryInterface
         $stmt->execute();
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        return $row ? new Book($row['publication_id'], $row['id']) : null;
+        return $row ? $this->mapRowToBook($row) : null;
     }
 
     public function getAll(): array
@@ -37,7 +37,7 @@ class BookRepository implements BookRepositoryInterface
         $stmt = $this->db->query("SELECT * FROM books");
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        return array_map(fn($row) => new Book($row['publication_id'], $row['id']), $result);
+        return array_map([$this, 'mapRowToBook'], $result);
     }
 
     public function findByPublicationId(int $publicationId): array
@@ -47,7 +47,7 @@ class BookRepository implements BookRepositoryInterface
         $stmt->execute();
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        return array_map(fn($row) => new Book($row['publication_id'], $row['id']), $result);
+        return array_map([$this, 'mapRowToBook'], $result);
     }
 
     public function update(int $id, Book $book): bool
@@ -63,5 +63,13 @@ class BookRepository implements BookRepositoryInterface
         $stmt = $this->db->prepare("DELETE FROM books WHERE id = :id");
         $stmt->bindValue(':id', $id, PDO::PARAM_INT);
         return $stmt->execute();
+    }
+
+    private function mapRowToBook(array $row): Book
+    {
+        return new Book(
+            (int) $row['publication_id'],
+            (int) $row['id']
+        );
     }
 }

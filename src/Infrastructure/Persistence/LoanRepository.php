@@ -37,7 +37,7 @@ class LoanRepository implements LoanRepositoryInterface
         $stmt->execute(['id' => $id]);
 
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $data ? $this->mapToLoan($data) : null;
+        return $data ? $this->mapRowToLoan($data) : null;
     }
 
     public function findByUserId($userId): array
@@ -47,7 +47,7 @@ class LoanRepository implements LoanRepositoryInterface
         $stmt->execute(['user_id' => $userId]);
 
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        return array_map([$this, 'mapToLoan'], $data);
+        return array_map([$this, 'mapRowToLoan'], $data);
     }
 
     public function findByBookId($bookId): array
@@ -57,7 +57,7 @@ class LoanRepository implements LoanRepositoryInterface
         $stmt->execute(['book_id' => $bookId]);
 
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        return array_map([$this, 'mapToLoan'], $data);
+        return array_map([$this, 'mapRowToLoan'], $data);
     }
 
     public function update(Loan $loan): bool
@@ -93,10 +93,10 @@ class LoanRepository implements LoanRepositoryInterface
         $stmt = $this->pdo->query($sql);
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        return array_map([$this, 'mapToLoan'], $data);
+        return array_map([$this, 'mapRowToLoan'], $data);
     }
 
-    private function mapToLoan(array $data): Loan
+    private function mapRowToLoan(array $data): Loan
     {
         return new Loan(
             (int)$data['user_id'],
