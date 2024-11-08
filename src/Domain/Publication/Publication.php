@@ -5,22 +5,22 @@ use Src\Domain\ValueObjects\ISBN;
 
 class Publication
 {
-    private int $id;
+    private ?int $id;
     private string $title;
     private string $author;
     private int $publishedYear;
     private ISBN $isbn;
 
-    public function __construct(int $id, string $title, string $author, int $publishedYear, ISBN $isbn)
+    public function __construct(string $title, string $author, int $publishedYear, ISBN $isbn, ?int $id = null)
     {
-        $this->id = $id;
         $this->title = $title;
         $this->author = $author;
         $this->publishedYear = $publishedYear;
         $this->isbn = $isbn;
+        $this->id = $id;
     }
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -43,11 +43,6 @@ class Publication
     public function getIsbn(): ISBN
     {
         return $this->isbn;
-    }
-
-    public function setId(int $id): void
-    {
-        $this->id = $id;
     }
 
     public function setTitle(string $title): void

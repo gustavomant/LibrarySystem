@@ -4,16 +4,16 @@ namespace Src\Domain\Book;
 
 class Book
 {
-    private int $id;
+    private ?int $id;
     private int $publicationId;
 
-    public function __construct(int $id, int $publicationId)
+    public function __construct(int $publicationId, ?int $id = null)
     {
-        $this->id = $id;
         $this->publicationId = $publicationId;
+        $this->id = $id;
     }
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -21,15 +21,5 @@ class Book
     public function getPublicationId(): int
     {
         return $this->publicationId;
-    }
-
-    public function setId(int $id): void
-    {
-        $this->id = $id;
-    }
-
-    public function setPublicationId(int $publicationId): void
-    {
-        $this->publicationId = $publicationId;
     }
 }

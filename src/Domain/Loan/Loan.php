@@ -4,22 +4,22 @@ namespace Src\Domain\Loan;
 
 class Loan
 {
-    private $id;
-    private $bookId;
-    private $userId;
-    private $loanDate;
-    private $expectedReturnDate;
-    private $returnDate;
-    private $returned;
+    private ?int $id;
+    private int $bookId;
+    private int $userId;
+    private \DateTime $loanDate;
+    private ?\DateTime $expectedReturnDate;
+    private ?\DateTime $returnDate;
+    private bool $returned;
     
     public function __construct(
-        $bookId,
-        $userId,
-        $loanDate,
-        $expectedReturnDate,
-        $returnDate = null,
-        $returned = false,
-        $id = null
+        int $bookId,
+        int $userId,
+        \DateTime $loanDate,
+        ?\DateTime $expectedReturnDate = null,
+        ?\DateTime $returnDate = null,
+        bool $returned = false,
+        ?int $id = null
     ) {
         $this->bookId = $bookId;
         $this->userId = $userId;
@@ -30,49 +30,49 @@ class Loan
         $this->id = $id;
     }
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getBookId()
+    public function getBookId(): int
     {
         return $this->bookId;
     }
 
-    public function getUserId()
+    public function getUserId(): int
     {
         return $this->userId;
     }
 
-    public function getLoanDate()
+    public function getLoanDate(): \DateTime
     {
         return $this->loanDate;
     }
 
-    public function getExpectedReturnDate()
+    public function getExpectedReturnDate(): ?\DateTime
     {
         return $this->expectedReturnDate;
     }
 
-    public function setExpectedReturnDate($expectedReturnDate): void
-    {
-        $this->expectedReturnDate = $expectedReturnDate;
-    }
-
-    public function getReturnDate()
+    public function getReturnDate(): ?\DateTime
     {
         return $this->returnDate;
-    }
-
-    public function setReturnDate($returnDate): void
-    {
-        $this->returnDate = $returnDate;
     }
 
     public function isReturned(): bool
     {
         return $this->returned;
+    }
+
+    public function setExpectedReturnDate(?\DateTime $expectedReturnDate): void
+    {
+        $this->expectedReturnDate = $expectedReturnDate;
+    }
+
+    public function setReturnDate(?\DateTime $returnDate): void
+    {
+        $this->returnDate = $returnDate;
     }
 
     public function setReturned(bool $returned): void

@@ -6,16 +6,12 @@ use InvalidArgumentException;
 
 class User
 {
-    private $id;
-    private $name;
-    private $email;
+    private ?int $id;
+    private string $name;
+    private string $email;
 
-    public function __construct(string $name, string $email, int $id = null)
+    public function __construct(string $name, string $email, ?int $id = null)
     {
-        if (empty($name) || empty($email)) {
-            throw new InvalidArgumentException('Name and email cannot be empty.');
-        }
-
         $this->name = $name;
         $this->email = $email;
         $this->id = $id;
@@ -36,11 +32,13 @@ class User
         return $this->email;
     }
 
-    public function setName($name) {
+    public function setName(string $name): void
+    {
         $this->name = $name;
     }
 
-    public function setEmail($email) {
+    public function setEmail(string $email): void
+    {
         $this->email = $email;
     }
 }
