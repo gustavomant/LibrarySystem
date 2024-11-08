@@ -1,0 +1,19 @@
+{
+    "name": "gustavo/php-test-jr",
+    "autoload": {
+        "psr-4": {
+            "Src\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "mantovan1",
+            "email": "gu.mantovane@gmail.com"
+        }
+    ],
+    "require": {
+        "slim/slim": "^4.14",
+        "robmorgan/phinx": "^0.16.5",
+        "guzzlehttp/psr7": "^2.7"
+    }
+}
