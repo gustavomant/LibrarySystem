@@ -61,9 +61,9 @@ class LoanService
         return $this->loanRepository->findByBookId($bookId);
     }
 
-    public function updateLoan(int $id, int $userId, int $bookId, \DateTime $loanDate, \DateTime $expectedReturnDate, ?\DateTime $returnDate, bool $returned): bool
+    public function updateLoan(int $userId, int $bookId, \DateTime $loanDate, \DateTime $expectedReturnDate, ?\DateTime $returnDate, bool $returned, int $id): bool
     {
-        $loan = new Loan($id, $userId, $bookId, $loanDate, $expectedReturnDate, $returnDate, $returned);
+        $loan = new Loan($userId, $bookId, $loanDate, $expectedReturnDate, $returnDate, $returned, $id);
         return $this->loanRepository->update($loan);
     }
 

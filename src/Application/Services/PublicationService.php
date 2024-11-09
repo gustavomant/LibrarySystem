@@ -15,9 +15,9 @@ class PublicationService
         $this->publicationRepository = $publicationRepository;
     }
 
-    public function createPublication(ISBN $isbn, string $title, string $author, int $publishedYear): bool
+    public function createPublication(string $title, string $author, int $publishedYear, ISBN $isbn): bool
     {
-        $publication = new Publication(0, $title, $author, $publishedYear, $isbn);
+        $publication = new Publication($title, $author, $publishedYear, $isbn);
                 
         return $this->publicationRepository->create($publication);
     }
@@ -34,7 +34,7 @@ class PublicationService
 
     public function updatePublication(int $id, ISBN $isbn, string $title, string $author, int $publishedYear): bool
     {
-        $publication = new Publication($id, $title, $author, $publishedYear, $isbn);
+        $publication = new Publication($title, $author, $publishedYear, $isbn, $id);
                 
         return $this->publicationRepository->update($id, $publication);
     }
