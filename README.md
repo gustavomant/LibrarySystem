@@ -2,47 +2,120 @@
 
 This system manages library resources, specifically users, publications, books, and loans. Each resource is modeled to capture key information and relationships, enabling users to interact with books and manage loans effectively.
 
-## Resources Overview
+## Prerequisites
+
+Before running the following commands, ensure that your PHP version is **8.2 or higher**. You can check your PHP version using the following command:
+
+```bash
+php -v
+```
+
+If your PHP version is below 8.2, you must update PHP to a version >= 8.2.
+
+Additionally, make sure all project dependencies are installed by running the following command:
+
+```bash
+composer install
+```
+
+This command installs all required dependencies specified in the `composer.json` file, including libraries like Phinx and PHPUnit.
+
+## Setup and Commands
+
+Follow these steps to set up and run the system:
+
+### 1. Run Database Migrations
+
+Execute the following command to run the database migrations using [Phinx](https://phinx.org/), which will apply necessary schema changes to your database:
+
+```bash
+php vendor/bin/phinx migrate
+```
+
+- **Explanation:**
+  - `php vendor/bin/phinx`: Runs the Phinx tool installed via Composer.
+  - `migrate`: Applies all pending migrations to your database.
+
+- **Usage:**
+  - Ensure that your database credentials are configured in the `phinx.yml` file.
+  - This command will create or update the necessary tables like `users`, `publications`, `books`, and `loans`.
+
+### 2. Start the PHP Built-in Web Server
+
+To start a local development server, use the following command:
+
+```bash
+php -S localhost:8000 -t public
+```
+
+- **Explanation:**
+  - `php -S localhost:8000`: Starts the PHP built-in web server on `localhost` at port `8000`.
+  - `-t public`: Specifies the `public` directory as the document root.
+
+- **Usage:**
+  - Once the server is running, open your browser and visit `http://localhost:8000` to access the application.
+  - The server will handle requests from the `public` directory and serve the web pages defined in your project.
+
+### 3. Run Tests with PHPUnit
+
+To run unit tests and ensure that the core functionality works as expected, execute the following command:
+
+```bash
+./vendor/bin/phpunit tests/
+```
+
+- **Explanation:**
+  - `./vendor/bin/phpunit`: Runs PHPUnit, the testing framework installed via Composer.
+  - `tests/`: The directory containing your test files.
+
+- **Usage:**
+  - This command will execute all tests within the `tests/` directory, verifying that the application behaves correctly, such as managing users, books, and loans.
+
+## System Overview
 
 ### Users
+
 - **Table:** `users`
-- **Description:** Represents individuals who can interact with the library system, such as borrowing books.
+- Represents individuals who can interact with the library system (e.g., borrow books).
 - **Columns:**
-  - `name` (string, max 50): The name of the user.
-  - `email` (string, max 100, unique): The email of the user.
-  - `created_at` (timestamp): Timestamp when the user was created.
-  - `updated_at` (timestamp, nullable): Timestamp for the last update on the user.
+  - `name` (string): The name of the user.
+  - `email` (string, unique): The user's email.
+  - `created_at` (timestamp): The date the user was created.
+  - `updated_at` (timestamp, nullable): The last update timestamp.
 
 ### Publications
+
 - **Table:** `publications`
-- **Description:** Represents a specific edition of a book, with details unique to that edition.
+- Represents a unique edition of a book.
 - **Columns:**
-  - `title` (string, max 255): Title of the publication.
-  - `author` (string, max 100): Author of the publication.
-  - `published_year` (integer, 4 digits): The year the edition was published.
-  - `isbn` (string, max 13, unique): ISBN identifier of the publication.
+  - `title` (string): Title of the publication.
+  - `author` (string): Author of the publication.
+  - `published_year` (integer): Year of publication.
+  - `isbn` (string, unique): ISBN identifier.
 
 ### Books
+
 - **Table:** `books`
-- **Description:** Represents a physical or digital copy of a specific publication. Each book record is linked to a unique publication.
+- Represents a physical or digital copy of a specific publication.
 - **Columns:**
-  - `publication_id` (integer, foreign key): References a `publication` record, linking the book to its edition.
+  - `publication_id` (integer, foreign key): Links to a publication.
 
 ### Loans
+
 - **Table:** `loans`
-- **Description:** Establishes a relationship between users and books, tracking loans of specific books to users.
+- Represents a loan relationship between users and books.
 - **Columns:**
-  - `user_id` (integer, foreign key): References a `user` record, linking the loan to a specific user.
-  - `book_id` (integer, foreign key): References a `book` record, indicating which book was borrowed.
-  - `loan_date` (datetime): The date and time when the loan was created.
-  - `expected_return_date` (datetime): The expected date for returning the loaned book.
-  - `return_date` (datetime, nullable): The actual date the book was returned.
-  - `returned` (boolean, default false): Indicates if the loaned book has been returned.
+  - `user_id` (integer, foreign key): References the user who borrows the book.
+  - `book_id` (integer, foreign key): References the borrowed book.
+  - `loan_date` (datetime): The date the book was borrowed.
+  - `expected_return_date` (datetime): The expected return date.
+  - `return_date` (datetime, nullable): The actual return date.
+  - `returned` (boolean): Marks whether the book was returned.
 
 ## Relationships
 
-- **Users → Loans**: Users can borrow multiple books, and each loan record links to a unique user.
-- **Publications → Books**: Each publication represents a unique edition, while each book represents an individual copy of that edition.
-- **Books → Loans**: Each loan is linked to a specific copy of a publication.
+- **Users → Loans:** Users can borrow multiple books. Each loan record links to a unique user.
+- **Publications → Books:** Each publication represents an edition, while each book represents an individual copy of that edition.
+- **Books → Loans:** Each loan links to a specific copy of a book.
 
 This setup allows tracking users, managing individual copies of publications, and monitoring loan statuses.
