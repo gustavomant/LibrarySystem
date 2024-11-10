@@ -122,6 +122,17 @@ This setup allows tracking users, managing individual copies of publications, an
 
 ## Controllers and Endpoints
 
+### LoginController
+
+Handles the login process for the system administrator.
+
+- **POST /login**: This route authenticates a system administrator with hardcoded credentials. The credentials (username and password) are not stored in a database but are predefined in the code itself.
+
+  - **Admin Authentication**: When the `POST /login` endpoint is called, it verifies the credentials against the hardcoded username and password.
+  - **JWT Token Generation**: Upon successful login, a JSON Web Token (JWT) is issued to allow the admin to access protected routes within the system. This token must be included in the `Authorization` header as `Bearer <token>` for accessing secure routes.
+
+  > **Note:** This hardcoded approach is intended for simplicity and quick setup. For a production environment, it is recommended to manage admin credentials in a secure, database-backed system.
+
 ### UserController
 
 Manages operations related to users who can borrow books.
@@ -160,17 +171,6 @@ Handles loan operations, managing the lending of books to users.
 - **POST /loans**: Create a new loan, linking a user and a book. Checks if the user has any expired pending loans.
 - **PUT /loans/{id}/return**: Mark a loan as returned, updating the return date and status.
 - **DELETE /loans/{id}**: Delete a loan by ID.
-
-### LoginController
-
-Handles the login process for the system administrator.
-
-- **POST /login**: This route authenticates a system administrator with hardcoded credentials. The credentials (username and password) are not stored in a database but are predefined in the code itself.
-
-  - **Admin Authentication**: When the `POST /login` endpoint is called, it verifies the credentials against the hardcoded username and password.
-  - **JWT Token Generation**: Upon successful login, a JSON Web Token (JWT) is issued to allow the admin to access protected routes within the system. This token must be included in the `Authorization` header as `Bearer <token>` for accessing secure routes.
-
-  > **Note:** This hardcoded approach is intended for simplicity and quick setup. For a production environment, it is recommended to manage admin credentials in a secure, database-backed system.
 
 ## Notes
 
