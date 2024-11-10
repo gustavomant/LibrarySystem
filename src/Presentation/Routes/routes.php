@@ -26,9 +26,9 @@ $publicationRepository = new PublicationRepository($db);
 $loanRepository = new LoanRepository($db);
 
 $userService = new UserService($userRepository);
-$bookService = new BookService($bookRepository);
+$bookService = new BookService($bookRepository, $publicationRepository);
 $publicationService = new PublicationService($publicationRepository);
-$loanService = new LoanService($loanRepository, $userRepository);
+$loanService = new LoanService($loanRepository, $userRepository, $bookRepository);
 
 $bookController = new BookController($bookService);
 $userController = new UserController($userService);

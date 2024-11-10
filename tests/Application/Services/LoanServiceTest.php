@@ -1,26 +1,33 @@
 <?php
 
 namespace Tests\Application\Services;
-
 use PHPUnit\Framework\TestCase;
 use Src\Application\Services\LoanService;
 use Src\Domain\Loan\Loan;
 use Src\Domain\Loan\LoanRepositoryInterface;
 use Src\Domain\User\UserRepositoryInterface;
 use Src\Domain\User\User;
+use Src\Domain\Book\Book;
+use Src\Domain\Book\BookRepositoryInterface;
 
 class LoanServiceTest extends TestCase
 {
     private LoanService $loanService;
     private $loanRepositoryMock;
     private $userRepositoryMock;
+    private $bookRepositoryMock;
 
     protected function setUp(): void
     {
         $this->loanRepositoryMock = $this->createMock(LoanRepositoryInterface::class);
         $this->userRepositoryMock = $this->createMock(UserRepositoryInterface::class);
+        $this->bookRepositoryMock = $this->createMock(BookRepositoryInterface::class);
 
-        $this->loanService = new LoanService($this->loanRepositoryMock, $this->userRepositoryMock);
+        $this->loanService = new LoanService(
+            $this->loanRepositoryMock,
+            $this->userRepositoryMock,
+            $this->bookRepositoryMock
+        );
     }
 
     public function testCreateLoanSuccess(): void
@@ -28,21 +35,25 @@ class LoanServiceTest extends TestCase
         $userId = 1;
         $bookId = 2;
 
+        $userMock = $this->createMock(User::class);
+        $bookMock = $this->createMock(Book::class);
+
         $this->userRepositoryMock->expects($this->once())
             ->method('findById')
             ->with($userId)
-            ->willReturn($this->createMock(User::class));
+            ->willReturn($userMock);
 
-        $this->loanRepositoryMock->expects($this->once())
-            ->method('findByUserId')
-            ->with($userId)
-            ->willReturn([]);
+        $this->bookRepositoryMock->expects($this->once())
+            ->method('find')
+            ->with($bookId)
+            ->willReturn($bookMock);
 
         $this->loanRepositoryMock->expects($this->once())
             ->method('create')
             ->willReturn(true);
 
         $result = $this->loanService->createLoan($userId, $bookId, 5);
+
         $this->assertTrue($result);
     }
 
@@ -50,16 +61,23 @@ class LoanServiceTest extends TestCase
     {
         $userId = 1;
         $bookId = 2;
-        $loanDate = new \DateTime();
 
         $loan = $this->createMock(Loan::class);
         $loan->method('isReturned')->willReturn(false);
         $loan->method('getExpectedReturnDate')->willReturn(new \DateTime('-1 day'));
 
+        $userMock = $this->createMock(User::class);
+        $bookMock = $this->createMock(Book::class);
+
         $this->userRepositoryMock->expects($this->once())
             ->method('findById')
             ->with($userId)
-            ->willReturn($this->createMock(User::class));
+            ->willReturn($userMock);
+
+        $this->bookRepositoryMock->expects($this->once())
+            ->method('find')
+            ->with($bookId)
+            ->willReturn($bookMock);
 
         $this->loanRepositoryMock->expects($this->once())
             ->method('findByUserId')
@@ -92,7 +110,6 @@ class LoanServiceTest extends TestCase
 
         $this->assertTrue($result);
     }
-
 
     public function testGetLoanById(): void
     {

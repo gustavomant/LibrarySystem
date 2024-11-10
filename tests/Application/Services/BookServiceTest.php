@@ -1,27 +1,42 @@
 <?php
 
 namespace Tests\Application\Services;
-
 use PHPUnit\Framework\TestCase;
 use Src\Application\Services\BookService;
 use Src\Domain\Book\Book;
 use Src\Domain\Book\BookRepositoryInterface;
+use Src\Domain\Publication\PublicationRepositoryInterface;
+use Src\Domain\Publication\Publication;
 
 class BookServiceTest extends TestCase
 {
     private BookService $bookService;
     private $bookRepositoryMock;
+    private $publicationRepositoryMock;
 
     protected function setUp(): void
     {
         $this->bookRepositoryMock = $this->createMock(BookRepositoryInterface::class);
-        $this->bookService = new BookService($this->bookRepositoryMock);
+
+        $this->publicationRepositoryMock = $this->createMock(PublicationRepositoryInterface::class);
+
+        $this->bookService = new BookService(
+            $this->bookRepositoryMock,
+            $this->publicationRepositoryMock
+        );
     }
 
     public function testCreateBook(): void
     {
         $publicationId = 1;
         $book = new Book($publicationId);
+        
+        $publicationMock = $this->createMock(Publication::class);
+        
+        $this->publicationRepositoryMock->expects($this->once())
+            ->method('find')
+            ->with($this->equalTo($publicationId))
+            ->willReturn($publicationMock);
 
         $this->bookRepositoryMock->expects($this->once())
             ->method('create')
@@ -29,8 +44,11 @@ class BookServiceTest extends TestCase
             ->willReturn(true);
 
         $result = $this->bookService->createBook($publicationId);
+
         $this->assertTrue($result);
     }
+
+
 
     public function testGetBookById(): void
     {

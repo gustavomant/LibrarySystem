@@ -1,21 +1,31 @@
 <?php
 
 namespace Src\Application\Services;
-
 use Src\Domain\Book\Book;
 use Src\Domain\Book\BookRepositoryInterface;
+use Src\Domain\Publication\PublicationRepositoryInterface;
 
 class BookService
 {
     private BookRepositoryInterface $bookRepository;
+    private PublicationRepositoryInterface $publicationRepository;
 
-    public function __construct(BookRepositoryInterface $bookRepository)
-    {
+    public function __construct(
+        BookRepositoryInterface $bookRepository,
+        PublicationRepositoryInterface $publicationRepository
+    ) {
         $this->bookRepository = $bookRepository;
+        $this->publicationRepository = $publicationRepository;
     }
 
     public function createBook(int $publicationId): bool
     {
+        $publication = $this->publicationRepository->find($publicationId);
+
+        if ($publication === null) {
+            throw new \RuntimeException('Publication not found');
+        }
+
         $book = new Book($publicationId);
         return $this->bookRepository->create($book);
     }
