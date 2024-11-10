@@ -4,7 +4,7 @@ namespace Src\Domain\User;
 
 use InvalidArgumentException;
 
-class User
+class User implements \JsonSerializable
 {
     private ?int $id;
     private string $name;
@@ -40,5 +40,12 @@ class User
     public function setEmail(string $email): void
     {
         $this->email = $email;
+    }
+
+    public function jsonSerialize() {
+        return [
+            "name" => $this->getName(),
+            "email" => $this->getEmail()
+        ];
     }
 }

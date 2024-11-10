@@ -3,7 +3,7 @@
 namespace Src\Domain\Publication;
 use Src\Domain\ValueObjects\ISBN;
 
-class Publication
+class Publication implements \JsonSerializable
 {
     private ?int $id;
     private string $title;
@@ -63,5 +63,15 @@ class Publication
     public function setIsbn(ISBN $isbn): void
     {
         $this->isbn = $isbn;
+    }
+
+    public function jsonSerialize() {
+        return [
+            "id" => $this->getId(),
+            "title" => $this->getTitle(),
+            "author" => $this->getAuthor(),
+            "published_year" => $this->getPublishedYear(),
+            "isbn" => $this->getIsbn()->getValue()
+        ];
     }
 }

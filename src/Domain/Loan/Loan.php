@@ -2,7 +2,7 @@
 
 namespace Src\Domain\Loan;
 
-class Loan
+class Loan implements \JsonSerializable
 {
     private ?int $id;
     private int $bookId;
@@ -78,5 +78,17 @@ class Loan
     public function setReturned(bool $returned): void
     {
         $this->returned = $returned;
+    }
+
+    public function jsonSerialize() {
+        return [
+            "id" => $this->getId(),
+            "book_id" => $this->getBookId(),
+            "user_id" => $this->getUserId(),
+            "loan_date" => $this->getLoanDate(),
+            "expected_return_date" => $this->getExpectedReturnDate(),
+            "return_date" => $this->getReturnDate(),
+            "returned" => $this->isReturned()
+        ];
     }
 }

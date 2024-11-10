@@ -57,16 +57,14 @@ class UserService
         return $this->userRepository->delete($userId);
     }
 
-    public function getUserById(int $userId): ?UserDTO
+    public function getUserById(int $userId): ?User
     {
-        $user = $this->userRepository->findById($userId);
-        return $user ? UserDTO::fromUser($user) : null;
+        return $this->userRepository->findById($userId);
     }
 
-    public function getUserByEmail(string $email): ?UserDTO
+    public function getUserByEmail(string $email): ?User
     {
-        $user = $this->userRepository->findByEmail($email);
-        return $user ? UserDTO::fromUser($user) : null;
+        return $this->userRepository->findByEmail($email);
     }
 
     public function getAllUsers(): array

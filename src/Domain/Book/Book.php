@@ -2,7 +2,7 @@
 
 namespace Src\Domain\Book;
 
-class Book
+class Book implements \JsonSerializable
 {
     private ?int $id;
     private int $publicationId;
@@ -21,5 +21,12 @@ class Book
     public function getPublicationId(): int
     {
         return $this->publicationId;
+    }
+
+    public function jsonSerialize() {
+        return [
+            "id" => $this->getId(),
+            "publication_id" => $this->getPublicationId()
+        ];
     }
 }

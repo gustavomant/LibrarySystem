@@ -3,7 +3,7 @@
 namespace Src\Application\DTOs;
 use Src\Domain\User\User;
 
-class UserDTO
+class UserDTO implements \JsonSerializable
 {
     private $id;
     private $name;
@@ -38,5 +38,13 @@ class UserDTO
     public function getEmail(): string
     {
         return $this->email;
+    }
+
+    public function jsonSerialize() {
+        return [
+            "id" => $this->getId(),
+            "name" => $this->getName(),
+            "email" => $this->getEmail(),
+        ];
     }
 }
