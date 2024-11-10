@@ -3,10 +3,10 @@
 namespace Tests\Application\Services;
 
 use PHPUnit\Framework\TestCase;
+use Src\Application\DTOS\UserDTO;
 use Src\Application\Services\UserService;
 use Src\Domain\User\User;
 use Src\Domain\User\UserRepositoryInterface;
-use Src\Application\DTOs\UserDTO;
 use Exception;
 
 class UserServiceTest extends TestCase
@@ -36,10 +36,10 @@ class UserServiceTest extends TestCase
             ->with($user)
             ->willReturn(true);
 
-        $userDTO = $this->userService->registerUser($name, $email);
-        $this->assertInstanceOf(UserDTO::class, $userDTO);
-        $this->assertEquals($name, $userDTO->getName());
-        $this->assertEquals($email, $userDTO->getEmail());
+        $userInstance = $this->userService->registerUser($name, $email);
+        $this->assertInstanceOf(UserDTO::class, $userInstance);
+        $this->assertEquals($name, $userInstance->getName());
+        $this->assertEquals($email, $userInstance->getEmail());
     }
 
     public function testRegisterUserEmailAlreadyExists(): void
@@ -75,10 +75,10 @@ class UserServiceTest extends TestCase
             ->with($user)
             ->willReturn(true);
 
-        $userDTO = $this->userService->updateUser($user, $name, $email);
-        $this->assertInstanceOf(UserDTO::class, $userDTO);
-        $this->assertEquals($name, $userDTO->getName());
-        $this->assertEquals($email, $userDTO->getEmail());
+        $userInstance = $this->userService->updateUser($user, $name, $email);
+        $this->assertInstanceOf(UserDTO::class, $userInstance);
+        $this->assertEquals($name, $userInstance->getName());
+        $this->assertEquals($email, $userInstance->getEmail());
     }
 
     public function testUpdateUserEmailAlreadyInUse(): void
@@ -89,7 +89,7 @@ class UserServiceTest extends TestCase
         $this->userRepositoryMock->expects($this->once())
             ->method('findByEmail')
             ->with('john.updated@example.com')
-            ->willReturn(new User('Jane Doe', 'john.updated@example.com')); // Email already in use by another user
+            ->willReturn(new User('Jane Doe', 'john.updated@example.com'));
 
         $this->expectException(Exception::class);
         $this->expectExceptionMessage("Email is already in use by another user.");
@@ -141,9 +141,9 @@ class UserServiceTest extends TestCase
             ->with($userId)
             ->willReturn($user);
 
-        $userDTO = $this->userService->getUserById($userId);
-        $this->assertInstanceOf(UserDTO::class, $userDTO);
-        $this->assertEquals($userId, $userDTO->getId());
+        $userInstance = $this->userService->getUserById($userId);
+        $this->assertInstanceOf(User::class, $userInstance);
+        $this->assertEquals($userId, $userInstance->getId());
     }
 
     public function testGetUserByIdNotFound(): void
@@ -155,8 +155,8 @@ class UserServiceTest extends TestCase
             ->with($userId)
             ->willReturn(null);
 
-        $userDTO = $this->userService->getUserById($userId);
-        $this->assertNull($userDTO);
+        $userInstance = $this->userService->getUserById($userId);
+        $this->assertNull($userInstance);
     }
 
     public function testGetUserByEmailSuccess(): void
@@ -169,9 +169,9 @@ class UserServiceTest extends TestCase
             ->with($email)
             ->willReturn($user);
 
-        $userDTO = $this->userService->getUserByEmail($email);
-        $this->assertInstanceOf(UserDTO::class, $userDTO);
-        $this->assertEquals($email, $userDTO->getEmail());
+        $userInstance = $this->userService->getUserByEmail($email);
+        $this->assertInstanceOf(User::class, $userInstance);
+        $this->assertEquals($email, $userInstance->getEmail());
     }
 
     public function testGetUserByEmailNotFound(): void
@@ -183,8 +183,8 @@ class UserServiceTest extends TestCase
             ->with($email)
             ->willReturn(null);
 
-        $userDTO = $this->userService->getUserByEmail($email);
-        $this->assertNull($userDTO);
+        $userInstance = $this->userService->getUserByEmail($email);
+        $this->assertNull($userInstance);
     }
 
     public function testGetAllUsers(): void
@@ -198,8 +198,8 @@ class UserServiceTest extends TestCase
             ->method('findAll')
             ->willReturn($users);
 
-        $userDTOs = $this->userService->getAllUsers();
-        $this->assertCount(2, $userDTOs);
-        $this->assertInstanceOf(UserDTO::class, $userDTOs[0]);
+        $userInstances = $this->userService->getAllUsers();
+        $this->assertCount(2, $userInstances);
+        $this->assertInstanceOf(UserDTO::class, $userInstances[0]);
     }
 }

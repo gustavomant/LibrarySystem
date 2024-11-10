@@ -6,24 +6,32 @@ use PHPUnit\Framework\TestCase;
 use Src\Application\Services\LoanService;
 use Src\Domain\Loan\Loan;
 use Src\Domain\Loan\LoanRepositoryInterface;
+use Src\Domain\User\UserRepositoryInterface;
+use Src\Domain\User\User;
 
 class LoanServiceTest extends TestCase
 {
     private LoanService $loanService;
     private $loanRepositoryMock;
+    private $userRepositoryMock;
 
     protected function setUp(): void
     {
         $this->loanRepositoryMock = $this->createMock(LoanRepositoryInterface::class);
-        $this->loanService = new LoanService($this->loanRepositoryMock);
+        $this->userRepositoryMock = $this->createMock(UserRepositoryInterface::class);
+
+        $this->loanService = new LoanService($this->loanRepositoryMock, $this->userRepositoryMock);
     }
 
     public function testCreateLoanSuccess(): void
     {
         $userId = 1;
         $bookId = 2;
-        $loanDate = new \DateTime();
-        $expectedReturnDate = new \DateTime('+7 days');
+
+        $this->userRepositoryMock->expects($this->once())
+            ->method('findById')
+            ->with($userId)
+            ->willReturn($this->createMock(User::class));
 
         $this->loanRepositoryMock->expects($this->once())
             ->method('findByUserId')
@@ -34,7 +42,7 @@ class LoanServiceTest extends TestCase
             ->method('create')
             ->willReturn(true);
 
-        $result = $this->loanService->createLoan($userId, $bookId, $loanDate, $expectedReturnDate);
+        $result = $this->loanService->createLoan($userId, $bookId, 5);
         $this->assertTrue($result);
     }
 
@@ -48,14 +56,43 @@ class LoanServiceTest extends TestCase
         $loan->method('isReturned')->willReturn(false);
         $loan->method('getExpectedReturnDate')->willReturn(new \DateTime('-1 day'));
 
+        $this->userRepositoryMock->expects($this->once())
+            ->method('findById')
+            ->with($userId)
+            ->willReturn($this->createMock(User::class));
+
         $this->loanRepositoryMock->expects($this->once())
             ->method('findByUserId')
             ->with($userId)
             ->willReturn([$loan]);
 
-        $result = $this->loanService->createLoan($userId, $bookId, $loanDate);
-        $this->assertFalse($result);
+        $this->expectException(\DomainException::class);
+        $this->expectExceptionMessage("User with ID $userId has expired pending loans.");
+
+        $this->loanService->createLoan($userId, $bookId, 5);
     }
+
+    public function testMarkLoanAsReturned(): void
+    {
+        $loanId = 1;
+
+        $loan = $this->createMock(Loan::class);
+
+        $this->loanRepositoryMock->expects($this->once())
+            ->method('findById')
+            ->with($loanId)
+            ->willReturn($loan);
+
+        $this->loanRepositoryMock->expects($this->once())
+            ->method('update')
+            ->with($loan)
+            ->willReturn(true);
+
+        $result = $this->loanService->markLoanAsReturned($loanId);
+
+        $this->assertTrue($result);
+    }
+
 
     public function testGetLoanById(): void
     {
@@ -97,27 +134,6 @@ class LoanServiceTest extends TestCase
 
         $result = $this->loanService->getLoansByBookId($bookId);
         $this->assertSame($loans, $result);
-    }
-
-    public function testUpdateLoan(): void
-    {
-        $loanId = 1;
-        $userId = 1;
-        $bookId = 2;
-        $loanDate = new \DateTime();
-        $expectedReturnDate = new \DateTime('+7 days');
-        $returnDate = new \DateTime();
-        $returned = true;
-
-        $loan = new Loan($userId, $bookId, $loanDate, $expectedReturnDate, $returnDate, $returned, $loanId);
-
-        $this->loanRepositoryMock->expects($this->once())
-            ->method('update')
-            ->with($this->equalTo($loan))
-            ->willReturn(true);
-
-        $result = $this->loanService->updateLoan($userId, $bookId, $loanDate, $expectedReturnDate, $returnDate, $returned, $loanId);
-        $this->assertTrue($result);
     }
 
     public function testDeleteLoan(): void
