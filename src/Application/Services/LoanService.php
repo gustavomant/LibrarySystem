@@ -1,27 +1,57 @@
 <?php
 
 namespace Src\Application\Services;
-
 use Src\Domain\Loan\Loan;
 use Src\Domain\Loan\LoanRepositoryInterface;
+use Src\Domain\User\UserRepositoryInterface;
 
 class LoanService
 {
     private LoanRepositoryInterface $loanRepository;
+    private UserRepositoryInterface $userRepository;
 
-    public function __construct(LoanRepositoryInterface $loanRepository)
+    public function __construct(LoanRepositoryInterface $loanRepository, UserRepositoryInterface $userRepository)
     {
         $this->loanRepository = $loanRepository;
+        $this->userRepository = $userRepository;
     }
 
-    public function createLoan(int $userId, int $bookId, \DateTime $loanDate, ?\DateTime $expectedReturnDate = null, ?\DateTime $returnDate = null): bool
+    public function createLoan(int $userId, int $bookId, int $loanDurationDays): bool
     {
+        if ($this->userRepository->findById($userId) === null) {
+            throw new \InvalidArgumentException("User with ID $userId does not exist.");
+        }
+
         if ($this->hasExpiredPendingLoans($userId)) {
+            throw new \DomainException("User with ID $userId has expired pending loans.");
+        }
+
+        $loanDate = new \DateTime();
+        $expectedReturnDate = (new \DateTime())->modify("+$loanDurationDays days");
+
+        $loan = new Loan($bookId, $userId, $loanDate, $expectedReturnDate, null, false, null);
+        return $this->loanRepository->create($loan);
+    }
+
+    /**
+     * Marks a loan as returned by updating only return_date and returned status.
+     * 
+     * @param int $loanId The ID of the loan to be updated.
+     * @param bool $returned The status to mark as returned.
+     * @return bool True if the update was successful, otherwise false.
+     */
+    public function markLoanAsReturned(int $loanId): bool
+    {
+        $loan = $this->loanRepository->findById($loanId);
+
+        if (!$loan) {
             return false;
         }
 
-        $loan = new Loan($bookId, $userId, $loanDate, $expectedReturnDate, $returnDate, false);
-        return $this->loanRepository->create($loan);
+        $loan->setReturnDate(new \DateTime());
+        $loan->setReturned(true);
+
+        return $this->loanRepository->update($loan);
     }
 
     /**
@@ -59,12 +89,6 @@ class LoanService
     public function getLoansByBookId(int $bookId): array
     {
         return $this->loanRepository->findByBookId($bookId);
-    }
-
-    public function updateLoan(int $userId, int $bookId, \DateTime $loanDate, \DateTime $expectedReturnDate, ?\DateTime $returnDate, bool $returned, int $id): bool
-    {
-        $loan = new Loan($userId, $bookId, $loanDate, $expectedReturnDate, $returnDate, $returned, $id);
-        return $this->loanRepository->update($loan);
     }
 
     public function deleteLoan(int $id): bool
