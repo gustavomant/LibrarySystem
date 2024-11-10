@@ -11,7 +11,11 @@ use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 
 class AuthMiddleware
 {
+    // This is a hard-coded username for demonstration purposes.
+    // In a production environment, it should be replaced with a more secure and dynamic approach
+    // such as validating against a database or an identity provider.
     private const HARDCODED_USERNAME = 'admin';
+    
     private ResponseFactoryInterface $responseFactory;
 
     public function __construct(ResponseFactoryInterface $responseFactory)
