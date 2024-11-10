@@ -48,7 +48,20 @@ class BookServiceTest extends TestCase
         $this->assertTrue($result);
     }
 
-
+    public function testCreateBookFailsDueToNonExistentPublication(): void
+    {
+        $publicationId = 1;
+        $book = new Book($publicationId);
+        
+        $this->publicationRepositoryMock->expects($this->once())
+            ->method('find')
+            ->with($this->equalTo($publicationId))
+            ->willReturn(null);
+    
+        $this->expectException(\InvalidArgumentException::class);
+    
+        $this->bookService->createBook($publicationId);
+    }
 
     public function testGetBookById(): void
     {

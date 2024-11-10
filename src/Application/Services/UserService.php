@@ -19,7 +19,7 @@ class UserService
     public function registerUser(string $name, string $email): UserDTO
     {
         if ($this->userRepository->findByEmail($email)) {
-            throw new Exception("User with this email already exists.");
+            throw new \InvalidArgumentException("User with this email already exists.");
         }
 
         $user = new User($name, $email);
@@ -37,7 +37,7 @@ class UserService
         if ($email !== null) {
             $existingUser = $this->userRepository->findByEmail($email);
             if ($existingUser && $existingUser->getId() !== $user->getId()) {
-                throw new Exception("Email is already in use by another user.");
+                throw new \InvalidArgumentException("Email is already in use by another user.");
             }
             $user->setEmail($email);
         }

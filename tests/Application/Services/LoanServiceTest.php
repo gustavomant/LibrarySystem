@@ -57,6 +57,44 @@ class LoanServiceTest extends TestCase
         $this->assertTrue($result);
     }
 
+    public function testCreateLoanFailsDueToNonExistentUser(): void
+    {
+        $userId = 1;
+        $bookId = 2;
+
+        $this->userRepositoryMock->expects($this->once())
+            ->method('findById')
+            ->with($userId)
+            ->willReturn(null);
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->loanService->createLoan($userId, $bookId, 5);
+    }
+
+    public function testCreateLoanFailsDueToNonExistentBook(): void
+    {
+        $userId = 1;
+        $bookId = 2;
+
+        $userMock = $this->createMock(User::class);
+
+        $this->userRepositoryMock->expects($this->once())
+            ->method('findById')
+            ->with($userId)
+            ->willReturn($userMock);
+
+        $this->bookRepositoryMock->expects($this->once())
+            ->method('find')
+            ->with($bookId)
+            ->willReturn(null);
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->loanService->createLoan($userId, $bookId, 5);
+    }
+
+
     public function testCreateLoanFailsDueToExpiredPendingLoans(): void
     {
         $userId = 1;

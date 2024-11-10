@@ -23,7 +23,7 @@ class BookService
         $publication = $this->publicationRepository->find($publicationId);
 
         if ($publication === null) {
-            throw new \RuntimeException('Publication not found');
+            throw new \InvalidArgumentException('Publication not found');
         }
 
         $book = new Book($publicationId);
